@@ -7,9 +7,9 @@ indeed_soup = BeautifulSoup(indeed_result.text, "html.parser")
 
 pagination = indeed_soup.find("div", {"class": "pagination"})
 
-pages = pagination.find_all('a')
-spans = []
-for page in pages:
-    spans.append(page.find("span"))
+links = pagination.find_all('a')
+pages = []
+for link in links[:-1]:
+    pages.append(int(link.string))
 
-print(spans[:-1])
+print(pages[-1])
