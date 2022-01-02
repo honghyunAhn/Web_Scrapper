@@ -5,7 +5,7 @@ LIMIT = 50
 URL = f'https://www.indeed.com/jobs?q=python&limit={LIMIT}'
 
 
-def extract_indeed_pages():
+def get_last_page():
     result = requests.get(URL)
     # result를 print시 작동된다는 뜻.
     # result.text print시 모든 html을 프린트한다.
@@ -38,11 +38,14 @@ def extract_job(html):
     title = html.select_one('.jobTitle>span').string
 
     company = html.find("span", {"class": "companyName"})
-    company_anchor = company.find("a")
-    if company_anchor is not None:
-        company = str(company_anchor.string)
+    if company:
+        company_anchor = company.find("a")
+        if company_anchor is not None:
+            company = str(company_anchor.string)
+        else:
+            company = str(company.string)
     else:
-        company = str(company.string)
+        company = None
 
     location = html.select_one("pre > div").text
 
@@ -55,7 +58,7 @@ def extract_job(html):
     }
 
 
-def extract_indeed_jobs(last_page):
+def extract_jobs(last_page):
     jobs = []
     for page in range(last_page):
         print(f"Scrapping page {page}")
@@ -65,4 +68,10 @@ def extract_indeed_jobs(last_page):
         for result in results:
             job = extract_job(result)
             jobs.append(job)
+    return jobs
+
+
+def get_jobs():
+    last_page = get_last_page()
+    jobs = extract_jobs(last_page)
     return jobs
